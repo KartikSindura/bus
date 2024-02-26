@@ -12,16 +12,25 @@ import React, { useState } from "react";
 import BusCreator from "../components/BusCreator";
 import BusButton from "../components/BusButton";
 import { FontAwesome } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
+import { increment, decrement, set } from "../slices/counterSlice";
+import { setTrue, setFalse } from "../slices/toggleSlice";
 
 export default function Homescreen({ navigation }) {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  // const [isModalVisible, setIsModalVisible] = useState(false);
+
   const [pin, setPin] = useState("0000");
-  const [fare, setFare] = useState("5");
   const [DL, setDL] = useState(null);
-  const [counter, setCounter] = useState(1);
+  // const [counter, setCounter] = useState(1);
+  const fare = useSelector((state) => state.fare.value);
+  const count = useSelector((state) => state.counter.value);
+  const isModalVisible = useSelector((state) => state.toggle.value);
+  const dispatch = useDispatch();
+
   const onModalClose = () => {
-    setIsModalVisible(false);
-    setCounter(1);
+    // setIsModalVisible(false);
+    dispatch(setFalse());
+    dispatch(set(1));
   };
   const onCreate = () => {
     setIsModalVisible();
@@ -33,8 +42,8 @@ export default function Homescreen({ navigation }) {
         transparent={true}
         visible={isModalVisible}
         onRequestClose={() => {
-          setIsModalVisible(false);
-          setCounter(1);
+          dispatch(setFalse());
+          dispatch(set(1));
         }}
       >
         <View style={styles.modalContent}>
@@ -46,11 +55,11 @@ export default function Homescreen({ navigation }) {
           </View>
           <ScrollView>
             <View style={styles.buttonContainer}>
-              <BusButton color="#F28627" />
-              <BusButton color="#219653" />
-              <BusButton color="#D63A3A" />
-              <BusButton color="#2E81EB" />
-              <BusButton color="#1BBABF" />
+              <BusButton color="#F28627" fareMultiplier={5} />
+              <BusButton color="#219653" fareMultiplier={5} />
+              <BusButton color="#D63A3A" fareMultiplier={10} />
+              <BusButton color="#2E81EB" fareMultiplier={10} />
+              <BusButton color="#1BBABF" fareMultiplier={10} />
             </View>
             <View style={styles.form}>
               <View style={styles.dl}>
@@ -92,8 +101,8 @@ export default function Homescreen({ navigation }) {
                   <Pressable
                     style={{ padding: 10, justifyContent: "center" }}
                     onPress={() => {
-                      if (counter > 1) {
-                        setCounter(counter - 1);
+                      if (count > 1) {
+                        dispatch(decrement());
                       }
                     }}
                   >
@@ -106,22 +115,33 @@ export default function Homescreen({ navigation }) {
                       alignItems: "center",
                     }}
                   >
-                    <Text>{counter}</Text>
+                    <Text>{count}</Text>
                   </View>
                   <Pressable
                     style={{ padding: 10, justifyContent: "center" }}
                     onPress={() => {
-                      if (counter < 10) setCounter(counter + 1);
+                      if (count < 10) {
+                        dispatch(increment());
+                      }
                     }}
                   >
                     <FontAwesome name="plus" size={15} />
                   </Pressable>
                 </View>
               </View>
+              <View style={styles.dl}>
+                <Text style={styles.text}>Fare</Text>
+                <Text style={styles.text}>₹{count * fare}</Text>
+              </View>
               <View
                 style={[styles.dl, { justifyContent: "center", marginTop: 30 }]}
               >
-                <Pressable style={styles.submitButton}>
+                <Pressable
+                  style={styles.submitButton}
+                  onPress={() => {
+                    dispatch(setFalse());
+                  }}
+                >
                   <Text style={{ textAlign: "center" }}>Submit</Text>
                 </Pressable>
               </View>
@@ -132,7 +152,8 @@ export default function Homescreen({ navigation }) {
       <Pressable
         style={styles.button}
         onPress={() => {
-          setIsModalVisible(true);
+          // setIsModalVisible(true);
+          dispatch(setTrue());
         }}
       >
         <Text>Create Bus</Text>
@@ -162,7 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   modalContent: {
-    height: "70%",
+    height: "75%",
     width: "100%",
     backgroundColor: "#fff",
     borderTopRightRadius: 15,
