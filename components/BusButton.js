@@ -1,11 +1,11 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import React, { useState } from "react";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from "react-redux";
 import { setFareMultiplier } from "../slices/fareSlice";
+import { setColor } from "../slices/colorSlice";
 
 export default function BusButton({ color, fareMultiplier }) {
-  const fare = useSelector((state) => state.fare.value);
   const dispatch = useDispatch();
 
   return (
@@ -14,9 +14,10 @@ export default function BusButton({ color, fareMultiplier }) {
         style={[styles.button, { backgroundColor: color, borderColor: color }]}
         onPress={() => {
           dispatch(setFareMultiplier(fareMultiplier));
+          dispatch(setColor(color));
         }}
       >
-        <FontAwesome name="bus" size={30} color="white" />
+        <FontAwesome5 name="bus" size={30} color="white" />
       </Pressable>
     </View>
   );
@@ -32,5 +33,6 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     backgroundColor: "#D10000",
     margin: 10,
+    elevation: 2
   },
 });

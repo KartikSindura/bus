@@ -11,18 +11,22 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React, { useState } from "react";
 import BusCreator from "../components/BusCreator";
 import BusButton from "../components/BusButton";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { increment, decrement, set } from "../slices/counterSlice";
 import { setTrue, setFalse } from "../slices/toggleSlice";
+import ticketController from "../controller/ticket";
+import { setFareMultiplier } from "../slices/fareSlice";
+import { setColor } from "../slices/colorSlice";
 
 export default function Homescreen({ navigation }) {
-  // const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const [pin, setPin] = useState("0000");
-  const [DL, setDL] = useState(null);
-  // const [counter, setCounter] = useState(1);
+  // const [busColor, setBusColor] = useState("#F28627")
+  const [DL, setDL] = useState("1PD5327");
+  const [route, setRoute] = useState("711");
+  const [start, setStart] = useState("C2B Janak Puri");
+  const [end, setEnd] = useState("Uttam Nagar Terminal");
   const fare = useSelector((state) => state.fare.value);
+  const color = useSelector((state) => state.color.value)
   const count = useSelector((state) => state.counter.value);
   const isModalVisible = useSelector((state) => state.toggle.value);
   const dispatch = useDispatch();
@@ -63,12 +67,13 @@ export default function Homescreen({ navigation }) {
             </View>
             <View style={styles.form}>
               <View style={styles.dl}>
-                <Text style={styles.text}>DL{DL}</Text>
+                <Text style={styles.text}>DL</Text>
                 <TextInput
                   style={styles.textInput}
                   keyboardType="numeric"
                   maxLength={4}
                   placeholder="0000"
+                  onChangeText={setDL}
                 ></TextInput>
               </View>
               <View style={styles.dl}>
@@ -77,6 +82,7 @@ export default function Homescreen({ navigation }) {
                   style={styles.textInput}
                   autoCapitalize={"characters"}
                   placeholder="703A"
+                  onChangeText={setRoute}
                 ></TextInput>
               </View>
               <View style={styles.dl}>
@@ -85,6 +91,7 @@ export default function Homescreen({ navigation }) {
                   style={styles.textInput}
                   defaultValue="C2B Janak Puri"
                   placeholder="Starting stop"
+                  onChangeText={setStart}
                 ></TextInput>
               </View>
               <View style={styles.dl}>
@@ -93,6 +100,7 @@ export default function Homescreen({ navigation }) {
                   style={styles.textInput}
                   defaultValue="Uttam Nagar Terminal"
                   placeholder="Ending stop"
+                  onChangeText={setEnd}
                 ></TextInput>
               </View>
               <View style={styles.dl}>
@@ -106,7 +114,7 @@ export default function Homescreen({ navigation }) {
                       }
                     }}
                   >
-                    <FontAwesome name="minus" size={15} />
+                    <FontAwesome5 name="minus" size={15} />
                   </Pressable>
                   <View
                     style={{
@@ -125,7 +133,7 @@ export default function Homescreen({ navigation }) {
                       }
                     }}
                   >
-                    <FontAwesome name="plus" size={15} />
+                    <FontAwesome5 name="plus" size={15} />
                   </Pressable>
                 </View>
               </View>
@@ -140,6 +148,20 @@ export default function Homescreen({ navigation }) {
                   style={styles.submitButton}
                   onPress={() => {
                     dispatch(setFalse());
+                    const ticket = ticketController.createTicket(
+                      DL,
+                      route,
+                      start,
+                      end,
+                      count,
+                      fare,
+                      color
+                    );
+                    ticketController.addTicket(ticket);
+                    dispatch(setFareMultiplier(5))
+                    dispatch(set(1))
+                    dispatch(setColor("#F28627"))
+                    navigation.navigate("My Tickets");
                   }}
                 >
                   <Text style={{ textAlign: "center" }}>Submit</Text>
@@ -177,10 +199,10 @@ const styles = StyleSheet.create({
   button: {
     alignItems: "center",
     padding: 20,
-    margin: 20,
-    borderColor: "red",
-    borderWidth: 1,
+    margin: 10,
     borderRadius: 10,
+    backgroundColor: 'white',
+    elevation: 2
   },
   modalContent: {
     height: "75%",
