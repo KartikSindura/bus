@@ -1,4 +1,14 @@
-import { View, FlatList, StyleSheet, Text } from "react-native";
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Pressable,
+  TouchableHighlight,
+  Touchable,
+  TouchableWithoutFeedback,
+} from "react-native";
 import MyText from "../components/MyText";
 import React, { useEffect, useState } from "react";
 import ticketController from "../controller/ticket";
@@ -6,7 +16,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Octicons } from "@expo/vector-icons";
 
-export default function Mytickets() {
+export default function Mytickets({ navigation }) {
   const [tickets, setTickets] = useState([]);
 
   useEffect(() => {
@@ -14,18 +24,24 @@ export default function Mytickets() {
       const tickets = await ticketController.getTickets();
       setTickets(tickets);
     };
-    getT();
-  }, [tickets]);
 
-  const Item = ({ dl, route, start, end, count, fare, color, cost, time }) => (
-    <View style={styles.item}>
+    getT();
+  }, []);
+
+  const Item = ({ dl, busRoute, start, end, count, fare, color, cost, time }) => (
+    <Pressable
+      style={styles.item}
+      onPress={() => {
+        navigation.navigate("Ticket", { dl, busRoute, start, end, count, fare, color, cost, time });
+      }}
+    >
       <View style={styles.top}>
         <View style={[styles.icon, { backgroundColor: color }]}>
           <FontAwesome5 name="bus" size={19} color="white" />
         </View>
         <View style={styles.left}>
           <Text style={{ fontWeight: "bold", position: "relative" }}>
-            {route}
+            {busRoute}
           </Text>
           <Text
             style={{
@@ -61,17 +77,17 @@ export default function Mytickets() {
           </Text>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 
   return (
     <View>
       <FlatList
         data={tickets}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <Item
             dl={item.dl}
-            route={item.route}
+            busRoute={item.busRoute}
             start={item.start}
             end={item.end}
             count={item.count}
@@ -87,6 +103,9 @@ export default function Mytickets() {
   );
 }
 const styles = StyleSheet.create({
+  pill: {
+    // width: 50, height: 50
+  },
   bottom: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -113,6 +132,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   item: {
+    flex: 1,
     borderRadius: 10,
     height: 170,
     padding: 20,
@@ -120,9 +140,12 @@ const styles = StyleSheet.create({
     margin: 10,
     marginLeft: 15,
     marginRight: 15,
-    elevation: 2
+    elevation: 2,
+    zIndex: 1,
+    position: "relative",
   },
   top: {
     justifyContent: "space-between",
+    flexDirection: "row",
   },
 });

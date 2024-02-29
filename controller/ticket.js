@@ -11,7 +11,7 @@ class TicketController {
 
   async getTicketsFromStorage(key) {
     const ticketsString = await AsyncStorage.getItem(key);
-    const tickets = ticketsString ? jsonpack.unpack(ticketsString) : [];
+    const tickets = ticketsString ? jsonpack.unpack(ticketsString) : []; // this will give you a new array, and arrays are objects, which are passed by reference
     return tickets;
   }
 
@@ -19,7 +19,7 @@ class TicketController {
     await AsyncStorage.setItem(key, jsonpack.pack(tickets));
   }
 
-  createTicket(dl, route, start, end, count, fare, color) {
+  createTicket(dl, busRoute, start, end, count, fare, color) {
     const months = [
       "Jan",
       "Feb",
@@ -40,7 +40,7 @@ class TicketController {
     const time =
       date.getDate() +
       " " +
-      months[date.getMonth() - 1] +
+      months[date.getMonth()] +
       ", " +
       (date.getFullYear() - 2000) +
       " | " +
@@ -52,7 +52,7 @@ class TicketController {
     const ticket = {
       id: uuid.v4().toString(),
       dl,
-      route,
+      busRoute,
       start,
       end,
       count,

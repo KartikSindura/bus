@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Homescreen from "./screens/Homescreen";
 import Createbus from "./screens/Createbus";
 import Mytickets from "./screens/Mytickets";
+import Ticketpopup from "./screens/Ticketpopup"
 import store from "./store";
 import { Provider } from "react-redux";
 
@@ -19,6 +20,7 @@ export default function App() {
           <Stack.Screen name="Home" component={Homescreen} />
           {/* <Stack.Screen name="Create" component={Createbus}/> */}
           <Stack.Screen name="My Tickets" component={Mytickets} />
+          <Stack.Screen name="Ticket" component={Ticketpopup} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

@@ -16,25 +16,24 @@ import { useDispatch, useSelector } from "react-redux";
 import { increment, decrement, set } from "../slices/counterSlice";
 import { setTrue, setFalse } from "../slices/toggleSlice";
 import ticketController from "../controller/ticket";
-import { setFareMultiplier } from "../slices/fareSlice";
-import { setColor } from "../slices/colorSlice";
+import { setBusState } from "../slices/busStateSlice";
 
 export default function Homescreen({ navigation }) {
-  // const [busColor, setBusColor] = useState("#F28627")
   const [DL, setDL] = useState("1PD5327");
-  const [route, setRoute] = useState("711");
+  const [busRoute, setbusRoute] = useState("711");
   const [start, setStart] = useState("C2B Janak Puri");
   const [end, setEnd] = useState("Uttam Nagar Terminal");
-  const fare = useSelector((state) => state.fare.value);
-  const color = useSelector((state) => state.color.value)
+  const fare = useSelector((state) => state.busState.value.fareMultiplier);
+  const color = useSelector((state) => state.busState.value.color);
   const count = useSelector((state) => state.counter.value);
   const isModalVisible = useSelector((state) => state.toggle.value);
   const dispatch = useDispatch();
 
   const onModalClose = () => {
-    // setIsModalVisible(false);
     dispatch(setFalse());
     dispatch(set(1));
+    setbusRoute("711")
+
   };
   const onCreate = () => {
     setIsModalVisible();
@@ -48,6 +47,7 @@ export default function Homescreen({ navigation }) {
         onRequestClose={() => {
           dispatch(setFalse());
           dispatch(set(1));
+          setbusRoute("711")
         }}
       >
         <View style={styles.modalContent}>
@@ -59,20 +59,20 @@ export default function Homescreen({ navigation }) {
           </View>
           <ScrollView>
             <View style={styles.buttonContainer}>
-              <BusButton color="#F28627" fareMultiplier={5} />
-              <BusButton color="#219653" fareMultiplier={5} />
-              <BusButton color="#D63A3A" fareMultiplier={10} />
-              <BusButton color="#2E81EB" fareMultiplier={10} />
-              <BusButton color="#1BBABF" fareMultiplier={10} />
+              <BusButton color="#F28627" fareMultiplier={5} index={0} />
+              <BusButton color="#219653" fareMultiplier={5} index={1} />
+              <BusButton color="#D63A3A" fareMultiplier={10} index={2} />
+              <BusButton color="#2E81EB" fareMultiplier={10} index={3} />
+              <BusButton color="#1BBABF" fareMultiplier={10} index={4} />
             </View>
             <View style={styles.form}>
               <View style={styles.dl}>
                 <Text style={styles.text}>DL</Text>
                 <TextInput
                   style={styles.textInput}
-                  keyboardType="numeric"
-                  maxLength={4}
-                  placeholder="0000"
+                  maxLength={10}
+                  placeholder="1PD5327"
+                  autoCapitalize={"characters"}
                   onChangeText={setDL}
                 ></TextInput>
               </View>
@@ -81,8 +81,8 @@ export default function Homescreen({ navigation }) {
                 <TextInput
                   style={styles.textInput}
                   autoCapitalize={"characters"}
-                  placeholder="703A"
-                  onChangeText={setRoute}
+                  placeholder="711"
+                  onChangeText={setbusRoute}
                 ></TextInput>
               </View>
               <View style={styles.dl}>
@@ -146,21 +146,27 @@ export default function Homescreen({ navigation }) {
               >
                 <Pressable
                   style={styles.submitButton}
-                  onPress={() => {
+                  onPress={async () => {
                     dispatch(setFalse());
                     const ticket = ticketController.createTicket(
                       DL,
-                      route,
+                      busRoute,
                       start,
                       end,
                       count,
                       fare,
                       color
                     );
-                    ticketController.addTicket(ticket);
-                    dispatch(setFareMultiplier(5))
-                    dispatch(set(1))
-                    dispatch(setColor("#F28627"))
+                    await ticketController.addTicket(ticket);
+                    dispatch(set(1));
+                    dispatch(
+                      setBusState({
+                        color: "#F28627",
+                        fareMultiplier: 5,
+                        index: 0,
+                      })
+                    );
+                    setbusRoute("711")
                     navigation.navigate("My Tickets");
                   }}
                 >
@@ -201,8 +207,8 @@ const styles = StyleSheet.create({
     padding: 20,
     margin: 10,
     borderRadius: 10,
-    backgroundColor: 'white',
-    elevation: 2
+    backgroundColor: "white",
+    elevation: 2,
   },
   modalContent: {
     height: "75%",
